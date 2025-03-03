@@ -4,23 +4,8 @@
 #include "FrontendInterface/FrontendInterface.h"
 #include <iostream>
 
-int main(int argc, char *argv[]) {
-  Disk disk_run;
-
-  /*unsigned char buffer[BLOCK_SIZE];
-  Disk::readBlock(buffer, 7000);
-  char message[] = "hello";
-  memcpy(buffer + 20, message, 6);
-  Disk::writeBlock(buffer, 7000);
-
-  unsigned char buffer2[BLOCK_SIZE];
-  char message2[6];
-  Disk::readBlock(buffer2, 7000);
-  memcpy(message2, buffer2 + 20, 6);
-  std::cout << message2;*/
-
-  
-
+void printAttributeCat(){
+    
   // create objects for the relation catalog and attribute catalog
   RecBuffer relCatBuffer(RELCAT_BLOCK);
   RecBuffer attrCatBuffer(ATTRCAT_BLOCK);
@@ -55,6 +40,52 @@ int main(int argc, char *argv[]) {
     }
     printf("\n");
   }
+}
+
+void updateAttrbuteCat(const char* relName,const char* oldAttrName,const char* newAttrName){
+  
+  RecBuffer attrCatBuffer(ATTRCAT_BLOCK);
+  HeadInfo attrCatHeader;
+  attrCatBuffer.getHeader(&attrCatHeader);
+
+  for(int recIndex = 0 ; recIndex < attrCatHeader.numEntries ; recIndex++){
+    Attribute attrCatRecord[ATTRCAT_NO_ATTRS];
+    attrCatBuffer.getRecord(attrCatRecord,recIndex);
+
+    if(strcmp(attrCatRecord[ATTRCAT_REL_NAME_INDEX].sVal,relName) == 0 and strcmp(attrCatRecord[ATTRCAT_ATTR_NAME_INDEX].sVal,oldAttrName) == 0){
+      strcpy(attrCatRecord[ATTRCAT_ATTR_NAME_INDEX].sVal,newAttrName);
+      attrCatBuffer.setRecord(attrCatRecord,recIndex);
+      break;
+    }
+
+    if(recIndex == attrCatHeader.numSlots-1){
+      recIndex = -1;
+      attrCatBuffer = RecBuffer (attrCatHeader.rblock);
+      attrCatBuffer.getHeader(&attrCatHeader);
+    }
+  }
+  
+}
+
+int main(int argc, char *argv[]) {
+  Disk disk_run;
+
+  /*unsigned char buffer[BLOCK_SIZE];
+  Disk::readBlock(buffer, 7000);
+  char message[] = "hello";
+  memcpy(buffer + 20, message, 6);
+  Disk::writeBlock(buffer, 7000);
+
+  unsigned char buffer2[BLOCK_SIZE];
+  char message2[6];
+  Disk::readBlock(buffer2, 7000);
+  memcpy(message2, buffer2 + 20, 6);
+  std::cout << message2;*/
+
+  
+  updateAttrbuteCat("Students","Class","Branch");
+  printAttributeCat();
+  
 
   return 0;
 }
