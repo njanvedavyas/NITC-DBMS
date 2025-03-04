@@ -72,6 +72,9 @@ int main(int argc, char *argv[]) {
   StaticBuffer buffer;
   OpenRelTable cache;
 
+
+  return FrontendInterface::handleFrontend(argc, argv);
+
   /*unsigned char buffer[BLOCK_SIZE];
   Disk::readBlock(buffer, 7000);
   char message[] = "hello";
@@ -82,7 +85,7 @@ int main(int argc, char *argv[]) {
   char message2[6];
   Disk::readBlock(buffer2, 7000);
   memcpy(message2, buffer2 + 20, 6);
-  std::cout << message2;*/
+  std::cout << message2;
 
   
   //updateAttrbuteCat("Students","Class","Branch");
@@ -101,7 +104,6 @@ int main(int argc, char *argv[]) {
     }
     printf("\n");
   }
-  
+  */
 
-  return 0;
 }

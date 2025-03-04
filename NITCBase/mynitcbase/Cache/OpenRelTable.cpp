@@ -162,3 +162,25 @@ OpenRelTable::~OpenRelTable() {
     }
   }
 }
+
+/* This function will open a relation having name `relName`.
+Since we are currently only working with the relation and attribute catalog, we
+will just hardcode it. In subsequent stages, we will loop through all the relations
+and open the appropriate one.
+*/
+int OpenRelTable::getRelId(char relName[ATTR_SIZE]) {
+
+  // if relname is RELCAT_RELNAME, return RELCAT_RELID
+  if(strcmp(RELCAT_RELNAME,relName) == 0){
+    return RELCAT_RELID;
+  }
+  if(strcmp(ATTRCAT_RELNAME,relName) == 0){
+    return ATTRCAT_RELID;
+  }
+  // if relname is ATTRCAT_RELNAME, return ATTRCAT_RELID
+  if(strcmp(relName, "Students") == 0){
+        return 2;
+    }
+
+  return E_RELNOTOPEN;
+}
