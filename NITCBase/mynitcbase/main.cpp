@@ -69,6 +69,8 @@ void updateAttrbuteCat(const char* relName,const char* oldAttrName,const char* n
 
 int main(int argc, char *argv[]) {
   Disk disk_run;
+  StaticBuffer buffer;
+  OpenRelTable cache;
 
   /*unsigned char buffer[BLOCK_SIZE];
   Disk::readBlock(buffer, 7000);
@@ -83,8 +85,22 @@ int main(int argc, char *argv[]) {
   std::cout << message2;*/
 
   
-  updateAttrbuteCat("Students","Class","Branch");
-  printAttributeCat();
+  //updateAttrbuteCat("Students","Class","Branch");
+  //printAttributeCat();
+
+  RelCatEntry relCatBuf;
+  AttrCatEntry attrCatBuf;
+
+  for(int relId = 0 ; relId < 3 ; relId++){
+    RelCacheTable::getRelCatEntry(relId,&relCatBuf);
+    printf("Relation: %s\n",relCatBuf.relName);
+    for(int attrIndex = 0 ; attrIndex<relCatBuf.numAttrs ; attrIndex++){
+      AttrCacheTable::getAttrCatEntry(relId, attrIndex, &attrCatBuf);
+      const char* attrType = attrCatBuf.attrType == NUMBER ? "NUM" : "STR" ;
+      printf("%s: %s\n",attrCatBuf.attrName,attrType);
+    }
+    printf("\n");
+  }
   
 
   return 0;
