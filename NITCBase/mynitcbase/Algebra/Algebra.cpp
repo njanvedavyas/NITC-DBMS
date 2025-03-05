@@ -40,7 +40,7 @@ int Algebra::select(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE], char attr
 
   AttrCatEntry attrCatEntry;
   // get the attribute catalog entry for attr, using AttrCacheTable::getAttrcatEntry()
-  if(AttrCacheTable::getAttrCatEntry(srcRelId,attr,&attrCatEntry) == E_ATTRNOTEXIST){
+  if(AttrCacheTable::getAttrCatEntry(srcRelId, attr, &attrCatEntry) == E_ATTRNOTEXIST){
     return E_ATTRNOTEXIST;
   }
   //    return E_ATTRNOTEXIST if it returns the error
@@ -78,7 +78,7 @@ int Algebra::select(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE], char attr
   ************************/
 
   printf("|");
-  for (int i = 0; i < relCatEntry.numAttrs; ++i) {
+  for (int i = 0; i < relCatEntry.numAttrs; i++) {
     AttrCatEntry attrCatEntry;
     // get attrCatEntry at offset i using AttrCacheTable::getAttrCatEntry()
     AttrCacheTable::getAttrCatEntry(srcRelId, i, &attrCatEntry);
