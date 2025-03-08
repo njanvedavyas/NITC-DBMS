@@ -335,6 +335,33 @@ int OpenRelTable::closeRel(int relId) {
     return E_RELNOTOPEN;
   }
 
+    /****** Releasing the Relation Cache entry of the relation ******/
+
+  if (RelCacheTable::relCache[relId]->dirty =true)
+  {
+
+    /* Get the Relation Catalog entry from RelCacheTable::relCache
+    Then convert it to a record using RelCacheTable::relCatEntryToRecord(). */
+
+    Attribute relCatRecord[RELCAT_NO_ATTRS];
+    RelCacheTable::relCatEntryToRecord(&RelCacheTable::relCache[relId]->relCatEntry,relCatRecord);
+
+
+    // declaring an object of RecBuffer class to write back to the buffer
+    RecBuffer relCatBlock(RelCacheTable::relCache[relId]->recId.block);
+    relCatBlock.setRecord(relCatRecord, RelCacheTable::relCache[relId]->recId.slot);
+
+    // Write back to the buffer using relCatBlock.setRecord() with recId.slot
+  }
+
+  /****** Releasing the Attribute Cache entry of the relation ******/
+
+  // free the memory allocated in the attribute caches which was
+  // allocated in the OpenRelTable::openRel() function
+
+  // (because we are not modifying the attribute cache at this stage,
+  // write-back is not required. We will do it in subsequent
+  // stages when it becomes needed)
   // free the memory allocated in the relation and attribute caches which was
   // allocated in the OpenRelTable::openRel() function
 
