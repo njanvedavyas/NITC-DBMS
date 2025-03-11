@@ -231,6 +231,8 @@ int BlockBuffer::getFreeBlock(int blockType){
 
     // find a free buffer using StaticBuffer::getFreeBuffer() .
 
+    int bufferNum = StaticBuffer::getFreeBuffer(freeblock);
+
     // initialize the header of the block passing a struct HeadInfo with values
     // pblock: -1, lblock: -1, rblock: -1, numEntries: 0, numAttrs: 0, numSlots: 0
     // to the setHeader() function.
@@ -239,9 +241,9 @@ int BlockBuffer::getFreeBlock(int blockType){
     head.pblock = -1;
     head.lblock = -1;
     head.rblock = -1;
-    head.numEntries = -1;
-    head.numAttrs = -1;
-    head.numSlots = -1;
+    head.numEntries = 0;
+    head.numAttrs = 0;
+    head.numSlots = 0;
 
     BlockBuffer::setHeader(&head);
 
@@ -379,6 +381,41 @@ int compareAttrs(union Attribute attr1, union Attribute attr2, int attrType) {
         return 0;
     }
    
+}
+
+void BlockBuffer::releaseBlock(){
+
+    // if blockNum is INVALID_BLOCKNUM (-1), or it is invalidated already, do nothing
+
+    // else
+        /* get the buffer number of the buffer assigned to the block
+           using StaticBuffer::getBufferNum().
+           (this function return E_BLOCKNOTINBUFFER if the block is not
+           currently loaded in the buffer)
+            */
+
+        // if the block is present in the buffer, free the buffer
+        // by setting the free flag of its StaticBuffer::tableMetaInfo entry
+        // to true.
+
+        // free the block in disk by setting the data type of the entry
+        // corresponding to the block number in StaticBuffer::blockAllocMap
+        // to UNUSED_BLK.
+
+        // set the object's blockNum to INVALID_BLOCK (-1)
+
+        
+        if(this->blockNum == INVALID_BLOCKNUM ){
+            return;
+        }
+
+        int bufferNum = StaticBuffer::getBufferNum(this->blockNum);
+        if(bufferNum != E_BLOCKNOTINBUFFER){
+            StaticBuffer::metainfo[bufferNum].free = true;
+        }
+        StaticBuffer::blockAllocMap[this->blockNum] = UNUSED_BLK;
+        this->blockNum = INVALID_BLOCKNUM;
+       
 }
 
 

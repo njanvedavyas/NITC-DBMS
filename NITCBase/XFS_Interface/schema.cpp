@@ -229,4 +229,3 @@ int check_duplicate_attributes(int nAttrs, char attrs[][ATTR_SIZE]) {
 	}
 	return 0;
 }
-

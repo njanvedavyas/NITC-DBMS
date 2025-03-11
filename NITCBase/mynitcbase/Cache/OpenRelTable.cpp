@@ -162,23 +162,64 @@ OpenRelTable::~OpenRelTable() {
         }
     }
 
+    /**** Closing the catalog relations in the relation cache ****/
 
-  for(int i = 0 ; i < MAX_OPEN ; i++){
-    if(RelCacheTable::relCache[i] != nullptr){
-        free(RelCacheTable::relCache[i]);
-        RelCacheTable::relCache[i] = nullptr;
+    //releasing the relation cache entry of the attribute catalog
+
+    if (RelCacheTable::relCache[ATTRCAT_RELID]->dirty == true) {
+
+        /* Get the Relation Catalog entry from RelCacheTable::relCache
+        Then convert it to a record using RelCacheTable::relCatEntryToRecord(). */
+        RelCatEntry relCatEntry;
+		RelCacheTable::getRelCatEntry(ATTRCAT_RELID,&relCatEntry);
+        Attribute relcatRecord[RELCAT_NO_ATTRS];
+        RelCacheTable::relCatEntryToRecord(&relCatEntry, relcatRecord);
+
+        // declaring an object of RecBuffer class to write back to the buffer
+        RecId recId = RelCacheTable::relCache[ATTRCAT_RELID]->recId;
+        RecBuffer relCatBlock(recId.block);
+
+        // Write back to the buffer using relCatBlock.setRecord() with recId.slot
+        relCatBlock.setRecord(relcatRecord, recId.slot);
     }
+    // free the memory dynamically allocated to this RelCacheEntry
+    free(RelCacheTable::relCache[ATTRCAT_RELID]);
 
-    if(AttrCacheTable::attrCache[i] != nullptr){
-        struct AttrCacheEntry *attrCacheEntry = AttrCacheTable::attrCache[i];
-        while(attrCacheEntry != nullptr){
-            struct AttrCacheEntry *tempCacheEntry = attrCacheEntry;
-            attrCacheEntry = attrCacheEntry->next;
-            free(tempCacheEntry);
+
+    //releasing the relation cache entry of the relation catalog
+
+    if(RelCacheTable::relCache[RELCAT_RELID]->dirty == true) {
+
+        /* Get the Relation Catalog entry from RelCacheTable::relCache
+        Then convert it to a record using RelCacheTable::relCatEntryToRecord(). */
+        RelCatEntry relCatEntry;
+        RelCacheTable::getRelCatEntry(RELCAT_RELID, &relCatEntry);
+        Attribute relcatRecord[ATTRCAT_NO_ATTRS];
+        RelCacheTable::relCatEntryToRecord(&relCatEntry, relcatRecord);
+
+        // declaring an object of RecBuffer class to write back to the buffer
+        RecId recId = RelCacheTable::relCache[RELCAT_RELID]->recId;
+        RecBuffer attrCatBlock(recId.block);
+
+        // Write back to the buffer using relCatBlock.setRecord() with recId.slot
+        attrCatBlock.setRecord(relcatRecord, recId.slot);
+    }
+    // free the memory dynamically allocated for this RelCacheEntry
+    free(RelCacheTable::relCache[RELCAT_RELID]);
+
+
+
+    // free the memory allocated for the attribute cache entries of the
+    // relation catalog and the attribute catalog
+    for(int i=0 ; i < 2 ; i++){
+        struct AttrCacheEntry *entry = AttrCacheTable::attrCache[i];
+        while(entry != nullptr){
+            struct AttrCacheEntry *temp = entry;
+            entry = entry->next;
+            free(temp);
         }
-        AttrCacheTable::attrCache[i] = nullptr;
+        
     }
-  }
 }
 
 /* This function will open a relation having name `relName`.
@@ -337,14 +378,14 @@ int OpenRelTable::closeRel(int relId) {
 
     /****** Releasing the Relation Cache entry of the relation ******/
 
-  if (RelCacheTable::relCache[relId]->dirty =true)
+  if (RelCacheTable::relCache[relId]->dirty == true)
   {
 
     /* Get the Relation Catalog entry from RelCacheTable::relCache
     Then convert it to a record using RelCacheTable::relCatEntryToRecord(). */
 
     Attribute relCatRecord[RELCAT_NO_ATTRS];
-    RelCacheTable::relCatEntryToRecord(&RelCacheTable::relCache[relId]->relCatEntry,relCatRecord);
+    RelCacheTable::relCatEntryToRecord(&(RelCacheTable::relCache[relId]->relCatEntry),relCatRecord);
 
 
     // declaring an object of RecBuffer class to write back to the buffer
@@ -370,7 +411,7 @@ int OpenRelTable::closeRel(int relId) {
   entry = AttrCacheTable::attrCache[relId];
   while(entry !=  nullptr){
     temp = entry;
-    entry = entry ->next;
+    entry = entry->next;
     free(temp);
   }
 
