@@ -4,7 +4,23 @@
 #include <cstdio>
 #include <cstdlib>
 
-bool isNumber(char *str);
+bool isNumber(char *str){
+    int len;
+    float ignore;
+    /*
+    sscanf returns the number of elements read, so if there is no float matching
+    the first %f, ret will be 0, else it'll be 1
+
+    %n gets the number of characters read. this scanf sequence will read the
+    first float ignoring all the whitespace before and after. and the number of
+    characters read that far will be stored in len. if len == strlen(str), then
+    the string only contains a float with/without whitespace. else, there's other
+    characters.
+    */
+    int ret = sscanf(str, "%f %n", &ignore, &len);
+    return ret == 1 && len == strlen(str);
+}
+
 
 /*  used to select all the records that satisfy a condition.
     the arguments of the function are
@@ -281,19 +297,3 @@ int Algebra::project(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE],int tar_n
 
 
 // will return if a string can be parsed as a floating point number
-bool isNumber(char *str){
-    int len;
-    float ignore;
-    /*
-    sscanf returns the number of elements read, so if there is no float matching
-    the first %f, ret will be 0, else it'll be 1
-
-    %n gets the number of characters read. this scanf sequence will read the
-    first float ignoring all the whitespace before and after. and the number of
-    characters read that far will be stored in len. if len == strlen(str), then
-    the string only contains a float with/without whitespace. else, there's other
-    characters.
-    */
-    int ret = sscanf(str, "%f %n", &ignore, &len);
-    return ret == 1 && len == strlen(str);
-}
